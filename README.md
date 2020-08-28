@@ -4,6 +4,12 @@ Weather-tk is an app written in Python that shows the current weather. Weather d
 
 This project is a learning experience for me. Everything in this repo is licensed under the MIT license.
 
+## Screenshot:
+
+![screenshot](https://i.imgur.com/vU7yqU0.png)
+
+The look of the UI may vary depending on your OS.
+
 ## Dependencies
 - Python 3 (duh)
 - Python modules:
