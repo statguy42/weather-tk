@@ -1,11 +1,11 @@
 import tkinter as tk
-from fnc import get_weather
+from fnc import btn_pressed
 
 
 class MainWindow(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.geometry('360x150')
+        self.geometry('400x200')
         self.title('Weather')
 
         self.lab1 = tk.Label(self)
@@ -20,6 +20,9 @@ class MainWindow(tk.Tk):
 
         self.current_weather = CurrentWeatherFrame(self)
         # self.CurrentWeather gets packed after the button is pressed
+
+        # the following dict is used to cache icons in memory
+        self.icon_cache = dict()
 
         try:
             with open("api_key.txt") as keyfile:
@@ -41,7 +44,7 @@ class InputFrame(tk.Frame):
         self.inp = tk.Entry(self, textvariable=self.inp_text)
         self.inp.grid(row=0,column=1)
 
-        self.get_btn = tk.Button(self, text="Submit", command=lambda: get_weather(parent, self.inp.get()))
+        self.get_btn = tk.Button(self, text="Submit", command=lambda: btn_pressed(parent, self.inp.get()))
         self.get_btn.grid(row=0,column=2)
 
 
@@ -49,29 +52,40 @@ class CurrentWeatherFrame(tk.Frame):
     def __init__(self, parent):
         super().__init__()
 
+        self['bg'] = '#CCCCCC'
+
         self.city_lab = tk.Label(self)
         self.city_lab.grid(row=0, column=0, sticky='W')
 
-        self.sunrise_lab = tk.Label(self)
-        self.sunrise_lab.grid(row=1, column=0, sticky='W')
-
-        self.sunset_lab = tk.Label(self)
-        self.sunset_lab.grid(row=2, column=0, sticky='W')
-
-        self.desc_lab = tk.Label(self)
-        self.desc_lab.grid(row=0,column=1)
-
         self.temp_lab = tk.Label(self)
-        self.temp_lab.grid(row=1,column=1)
+        self.temp_lab.grid(row=1,column=0, sticky='W')
 
         self.feels_lab = tk.Label(self)
-        self.feels_lab.grid(row=2, column=1)
+        self.feels_lab.grid(row=2, column=0, sticky='W')
 
         self.humid_lab = tk.Label(self)
-        self.humid_lab.grid(row=0, column=2, sticky='E')
+        self.humid_lab.grid(row=3, column=0, sticky='W')
+
+        self.icon_code = None
+
+        self.icon_label = tk.Label(self)
+        self.icon_label.grid(row=0, column=1, rowspan=3)
+
+        self.desc_lab = tk.Label(self)
+        self.desc_lab.grid(row=2,column=1, rowspan=2)
+
+        self.wind_speed_lab = tk.Label(self)
+        self.wind_speed_lab.grid(row=0, column=2, sticky='E')
 
         self.clouds_lab = tk.Label(self)
         self.clouds_lab.grid(row=1, column=2, sticky='E')
 
-        self.wind_speed_lab = tk.Label(self)
-        self.wind_speed_lab.grid(row=2, column=2, sticky='E')
+        self.sunrise_lab = tk.Label(self)
+        self.sunrise_lab.grid(row=2, column=2, sticky='E')
+
+        self.sunset_lab = tk.Label(self)
+        self.sunset_lab.grid(row=3, column=2, sticky='E')
+
+        # change background color of all child widgets
+        for widget in self.children.values():
+            widget['bg'] = "#CCCCCC"
