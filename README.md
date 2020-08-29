@@ -33,6 +33,7 @@ More dependencies may be required as the proeject goes on.
 - ~~Add weather icons~~ (done, but the implementation might be changed)
 - Add daily forecast for 7 days
 - Add hourly forecast for 24 hours
+- Add searched location history
 
 ## Contribution
 This project is open to suggestions and pull requests.
