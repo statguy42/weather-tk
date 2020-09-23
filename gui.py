@@ -3,7 +3,7 @@ from fnc import btn_pressed
 
 
 class MainWindow(tk.Tk):
-    def __init__(self):
+    def __init__(self, threadworker):
         super().__init__()
         self.geometry('400x200')
         self.title('Weather')
@@ -23,6 +23,8 @@ class MainWindow(tk.Tk):
 
         # the following dict is used to cache icons in memory
         self.icon_cache = dict()
+
+        self.threadworker = threadworker
 
         try:
             with open("api_key.txt") as keyfile:
@@ -44,7 +46,8 @@ class InputFrame(tk.Frame):
         self.inp = tk.Entry(self, textvariable=self.inp_text)
         self.inp.grid(row=0,column=1)
 
-        self.get_btn = tk.Button(self, text="Submit", command=lambda: btn_pressed(parent, self.inp.get()))
+        #self.get_btn = tk.Button(self, text="Submit", command=lambda: btn_pressed(parent, self.inp.get()))
+        self.get_btn = tk.Button(self, text="Submit", command=lambda: parent.threadworker.submit(btn_pressed, parent, self.inp.get()))
         self.get_btn.grid(row=0,column=2)
 
 

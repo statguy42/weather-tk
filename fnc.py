@@ -8,6 +8,7 @@ from PIL import Image, ImageTk
 def btn_pressed(parent, inp):
     response = get_weather(parent, inp)
     write_output(parent, response)
+    #parent.after(0, write_output, parent, response)
     icon = get_icon(parent, parent.current_weather)
     draw_icon(parent.current_weather, icon)
 

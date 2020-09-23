@@ -1,7 +1,9 @@
+import concurrent.futures
 from gui import MainWindow
 
 def main():
-    app = MainWindow()
+    threadworker = concurrent.futures.ThreadPoolExecutor(max_workers=1)
+    app = MainWindow(threadworker)
     app.mainloop()
 
 if __name__ == "__main__":
