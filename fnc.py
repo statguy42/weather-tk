@@ -2,15 +2,18 @@ import datetime as DT
 import urllib.request, urllib.parse, urllib.error
 import json
 import io
+import tkinter as tk
 from PIL import Image, ImageTk
 
 
 def btn_pressed(parent, inp):
+    parent.after(0, parent.input.get_btn.configure, {'state':tk.DISABLED})
     response = get_weather(parent, inp)
     write_output(parent, response)
     #parent.after(0, write_output, parent, response)
     icon = get_icon(parent, parent.current_weather)
     draw_icon(parent.current_weather, icon)
+    parent.after(0, parent.input.get_btn.configure, {'state':tk.NORMAL})
 
 
 
