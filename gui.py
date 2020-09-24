@@ -92,3 +92,36 @@ class CurrentWeatherFrame(tk.Frame):
         # change background color of all child widgets
         for widget in self.children.values():
             widget['bg'] = "#CCCCCC"
+
+
+class ForecastDailyFrame(tk.Frame):
+    def __init__(self, parent):
+        super().__init__()
+
+        self.forecast_day_list = list()
+
+        for i in range(7):
+            self.forecast_day_list.append(ForecastDayFrame(self))
+            self.forecast_day_list[i].grid(row=0, column=i)
+
+
+class ForecastDayFrame(tk.Frame):
+    def __init(self, parent):
+        super().__init__()
+
+        self.day_label = tk.Label(self)
+        self.day_label.grid(row=0, column=0)
+
+        self.icon_code = None
+
+        self.icon_label = tk.Label(self)
+        self.icon_label.grid(row=1, column=0)
+
+        self.weather_desc_label = tk.Label(self)
+        self.weather_desc_label.grid(row=2, column=0)
+
+        self.temp_max_label = tk.Label(self)
+        self.temp_max_label.grid(row=3, column=0)
+
+        self.temp_min_label = tk.Label(self)
+        self.temp_min_label.grid(row=4, column=0)
