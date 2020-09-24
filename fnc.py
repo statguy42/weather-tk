@@ -53,6 +53,7 @@ def httpreq(parent, url, params=None):
 
     except urllib.error.HTTPError as err:
         parent.status_label.configure(text=err)
+        parent.after(0, parent.input.get_btn.configure, {'state':tk.NORMAL})
         raise
 
 
