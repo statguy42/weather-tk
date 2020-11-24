@@ -8,22 +8,42 @@ from PIL import Image, ImageTk
 
 def btn_pressed(parent, inp):
     parent.after(0, parent.input.get_btn.configure, {'state':tk.DISABLED})
-    response = get_weather(parent, inp)
-    write_output(parent, response)
+    current_weather = get_current_weather(parent, inp)
+    coords = get_city_coords(current_weather)
+    forecast_weather = get_forecast_weather(parent, coords)
+    write_current_output(parent, current_weather)
+    write_forecast_daily_output(parent, forecast_weather['daily'], forecast_weather['timezone_offset'])
     #parent.after(0, write_output, parent, response)
     icon = get_icon(parent, parent.current_weather)
     draw_icon(parent.current_weather, icon)
     parent.after(0, parent.input.get_btn.configure, {'state':tk.NORMAL})
 
 
-
-def get_weather(parent, inp):
+def get_current_weather(parent, inp):
     params = {
         'q':inp,
         'appid': parent.API_KEY,
         'units': parent.UNIT
     }
-    return httpreq(parent, parent.WEATHER_SERVICE_URL, params)
+
+    return httpreq(parent, parent.WEATHER_CURRENT_URL, params)
+
+def get_city_coords(current_weather):
+    return {
+        "lon" : current_weather["coord"]["lon"],
+        "lat" : current_weather["coord"]["lat"]
+    }
+
+
+def get_forecast_weather(parent, coords):
+    params = {
+        'lon' : coords['lon'],
+        'lat' : coords['lat'],
+        'appid' : parent.API_KEY,
+        'exclude' : 'current,minutely,hourly',
+        'units': parent.UNIT
+    }
+    return httpreq(parent, parent.WEATHER_FORECAST_URL, params)
 
 
 def get_icon(parent, host):
@@ -53,6 +73,7 @@ def httpreq(parent, url, params=None):
 
     except urllib.error.HTTPError as err:
         parent.status_label.configure(text=err)
+        print(err)
         parent.after(0, parent.input.get_btn.configure, {'state':tk.NORMAL})
         raise
 
@@ -61,8 +82,9 @@ def draw_icon(host, icon):
     host.icon_label.configure(image=icon)
 
 
-def write_output(parent,response):
+def write_current_output(parent,response):
     parent.current_weather.pack()
+    parent.space_label.pack()
     parent.status_label.configure(text=f"Updated at {DT.datetime.now().strftime('%I:%M:%S %p')}")
     parent.current_weather.city_lab.configure(text=f"City: {response['name']}, {response['sys']['country']}")
     parent.current_weather.temp_lab.configure(text=f"Temp: {response['main']['temp']}°C")
@@ -76,3 +98,14 @@ def write_output(parent,response):
     parent.current_weather.icon_code = response['weather'][0]['icon'] + "@2x"
     # the "@2x" is appended to the icon code because bigger icons from openweathermap has it in the filename
 
+
+def write_forecast_daily_output(parent, daily_weather, timezone_offset):
+    parent.forecast_daily.pack()
+    i = 1
+    for frame in parent.forecast_daily.forecast_day_list:
+        frame.day_label.configure(text = DT.datetime.utcfromtimestamp(daily_weather[i]['dt'] + timezone_offset).strftime('%a'))
+        frame.icon_code = daily_weather[i]['weather'][0]['icon']
+        frame.weather_desc_label.configure(text = daily_weather[i]['weather'][0]['description'])
+        frame.temp_max_label.configure(text = f"{daily_weather[i]['temp']['max']}°C")
+        frame.temp_min_label.configure(text = f"{daily_weather[i]['temp']['min']}°C")
+        i += 1

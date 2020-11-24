@@ -5,8 +5,8 @@ from fnc import btn_pressed
 class MainWindow(tk.Tk):
     def __init__(self, threadworker):
         super().__init__()
-        self.geometry('400x200')
         self.title('Weather')
+        self.geometry('410x330')
 
         self.lab1 = tk.Label(self)
         self.lab1.configure(text="Enter city:")
@@ -19,7 +19,9 @@ class MainWindow(tk.Tk):
         self.status_label.pack()
 
         self.current_weather = CurrentWeatherFrame(self)
-        # self.CurrentWeather gets packed after the button is pressed
+        self.space_label = tk.Label(self, text = " ")
+        self.forecast_daily = ForecastDailyFrame(self)
+        # these two frames get packed after the button is pressed
 
         # the following dict is used to cache icons in memory
         self.icon_cache = dict()
@@ -28,7 +30,8 @@ class MainWindow(tk.Tk):
 
         try:
             with open("api_key.txt") as keyfile:
-                self.WEATHER_SERVICE_URL = "http://api.openweathermap.org/data/2.5/weather?"
+                self.WEATHER_CURRENT_URL = "http://api.openweathermap.org/data/2.5/weather?"
+                self.WEATHER_FORECAST_URL = "https://api.openweathermap.org/data/2.5/onecall?"
                 self.API_KEY = keyfile.read().rstrip("\n")
                 self.UNIT = "metric"
 
@@ -39,21 +42,21 @@ class MainWindow(tk.Tk):
 
 class InputFrame(tk.Frame):
     def __init__(self,parent):
-        super().__init__()
+        super().__init__(parent)
         self.inp_text = tk.StringVar()
         self.inp_text.set("London")
 
         self.inp = tk.Entry(self, textvariable=self.inp_text)
         self.inp.grid(row=0,column=1)
 
-        #self.get_btn = tk.Button(self, text="Submit", command=lambda: btn_pressed(parent, self.inp.get()))
-        self.get_btn = tk.Button(self, text="Submit", command=lambda: parent.threadworker.submit(btn_pressed, parent, self.inp.get()))
+        self.get_btn = tk.Button(self, text="Submit", command=lambda: btn_pressed(parent, self.inp.get()))
+        #self.get_btn = tk.Button(self, text="Submit", command=lambda: parent.threadworker.submit(btn_pressed, parent, self.inp.get()))
         self.get_btn.grid(row=0,column=2)
 
 
 class CurrentWeatherFrame(tk.Frame):
     def __init__(self, parent):
-        super().__init__()
+        super().__init__(parent)
 
         self['bg'] = '#CCCCCC'
 
@@ -96,7 +99,9 @@ class CurrentWeatherFrame(tk.Frame):
 
 class ForecastDailyFrame(tk.Frame):
     def __init__(self, parent):
-        super().__init__()
+        super().__init__(parent)
+
+        self['bg'] = '#CCCCCC'
 
         self.forecast_day_list = list()
 
@@ -106,10 +111,12 @@ class ForecastDailyFrame(tk.Frame):
 
 
 class ForecastDayFrame(tk.Frame):
-    def __init(self, parent):
-        super().__init__()
+    def __init__(self, parent):
+        super().__init__(parent)
 
-        self.day_label = tk.Label(self)
+        self['bg'] = '#CCCCCC'
+
+        self.day_label = tk.Label(self, text = "test")
         self.day_label.grid(row=0, column=0)
 
         self.icon_code = None
@@ -125,3 +132,6 @@ class ForecastDayFrame(tk.Frame):
 
         self.temp_min_label = tk.Label(self)
         self.temp_min_label.grid(row=4, column=0)
+
+        for widget in self.children.values():
+            widget['bg'] = "#CCCCCC"
