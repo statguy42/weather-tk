@@ -74,5 +74,5 @@ def write_output(parent,response):
     parent.current_weather.sunrise_lab.configure(text=f"Sunrise: {DT.datetime.utcfromtimestamp(response['sys']['sunrise']+response['timezone']).strftime('%I:%M %p')}")
     parent.current_weather.sunset_lab.configure(text=f"Sunset: {DT.datetime.utcfromtimestamp(response['sys']['sunset']+response['timezone']).strftime('%I:%M %p')}")
     parent.current_weather.icon_code = response['weather'][0]['icon'] + "@2x"
-    # the "@2x" is appended to the icon code because bigger icon's from openweathermap has it in the filename
+    # the "@2x" is appended to the icon code because bigger icons from openweathermap has it in the filename
 
