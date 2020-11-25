@@ -11,9 +11,8 @@ def btn_pressed(parent, inp):
     current_weather = get_current_weather(parent, inp)
     coords = get_city_coords(current_weather)
     forecast_weather = get_forecast_weather(parent, coords)
-    write_current_output(parent, current_weather)
-    write_forecast_daily_output(parent, forecast_weather['daily'], forecast_weather['timezone_offset'])
-    #parent.after(0, write_output, parent, response)
+    parent.after(0, write_current_output(parent, current_weather))
+    parent.after(0, write_forecast_daily_output(parent, forecast_weather['daily'], forecast_weather['timezone_offset']))
     icon = get_icon(parent, parent.current_weather)
     draw_icon(parent.current_weather, icon)
     parent.after(0, parent.input.get_btn.configure, {'state':tk.NORMAL})
@@ -25,7 +24,6 @@ def get_current_weather(parent, inp):
         'appid': parent.API_KEY,
         'units': parent.UNIT
     }
-
     return httpreq(parent, parent.WEATHER_CURRENT_URL, params)
 
 def get_city_coords(current_weather):

@@ -6,7 +6,7 @@ class MainWindow(tk.Tk):
     def __init__(self, threadworker):
         super().__init__()
         self.title('Weather')
-        self.geometry('410x330')
+        #self.geometry('410x330')
 
         self.lab1 = tk.Label(self)
         self.lab1.configure(text="Enter city:")
@@ -49,8 +49,8 @@ class InputFrame(tk.Frame):
         self.inp = tk.Entry(self, textvariable=self.inp_text)
         self.inp.grid(row=0,column=1)
 
-        self.get_btn = tk.Button(self, text="Submit", command=lambda: btn_pressed(parent, self.inp.get()))
-        #self.get_btn = tk.Button(self, text="Submit", command=lambda: parent.threadworker.submit(btn_pressed, parent, self.inp.get()))
+        #self.get_btn = tk.Button(self, text="Submit", command=lambda: btn_pressed(parent, self.inp.get()))
+        self.get_btn = tk.Button(self, text="Submit", command=lambda: parent.threadworker.submit(btn_pressed, parent, self.inp.get()))
         self.get_btn.grid(row=0,column=2)
 
 
