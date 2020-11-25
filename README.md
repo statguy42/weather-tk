@@ -6,7 +6,7 @@ This project is a learning experience for me. Everything in this repo is license
 
 ## Screenshot:
 
-![screenshot](https://i.imgur.com/vU7yqU0.png)
+![screenshot](https://imgur.com/0d6Bqt6.png)
 
 The look of the UI may vary depending on your OS.
 
