@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter.simpledialog import askstring
 from fnc import btn_pressed
 
 
@@ -29,16 +30,21 @@ class MainWindow(tk.Tk):
 
         self.threadworker = threadworker
 
+        self.WEATHER_CURRENT_URL = "http://api.openweathermap.org/data/2.5/weather?"
+        self.WEATHER_FORECAST_URL = "https://api.openweathermap.org/data/2.5/onecall?"
+        self.UNIT = "metric"
+
         try:
             with open("api_key.txt") as keyfile:
-                self.WEATHER_CURRENT_URL = "http://api.openweathermap.org/data/2.5/weather?"
-                self.WEATHER_FORECAST_URL = "https://api.openweathermap.org/data/2.5/onecall?"
                 self.API_KEY = keyfile.read().rstrip("\n")
-                self.UNIT = "metric"
-
         except:
             self.status_label.configure(text = "error openning api_key.txt")
-            self.input.get_btn.configure(state=tk.DISABLED)
+            self.API_KEY = askstring(title = "api_key.txt not found", prompt = "Please enter api key: ", parent = self)
+            if self.API_KEY is None:
+                self.input.get_btn.configure(state=tk.DISABLED)
+                self.status_label.configure(text = "No API key provided")
+            else:
+                self.status_label.configure(text = "")
 
 
 class InputFrame(tk.Frame):
