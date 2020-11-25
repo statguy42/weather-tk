@@ -20,8 +20,9 @@ class MainWindow(tk.Tk):
 
         self.current_weather = CurrentWeatherFrame(self)
         self.space_label = tk.Label(self, text = " ")
+        # this lable is used to create e bit of space between the two frames
         self.forecast_daily = ForecastDailyFrame(self)
-        # these two frames get packed after the button is pressed
+        # these two frames and the label get packed after the button is pressed
 
         # the following dict is used to cache icons in memory
         self.icon_cache = dict()

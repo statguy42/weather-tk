@@ -4,6 +4,7 @@ import json
 import io
 import tkinter as tk
 from PIL import Image, ImageTk
+import concurrent.futures
 
 
 def btn_pressed(parent, inp):
@@ -13,8 +14,7 @@ def btn_pressed(parent, inp):
     forecast_weather = get_forecast_weather(parent, coords)
     parent.after(0, write_current_output(parent, current_weather))
     parent.after(0, write_forecast_daily_output(parent, forecast_weather['daily'], forecast_weather['timezone_offset']))
-    icon = get_icon(parent, parent.current_weather)
-    draw_icon(parent.current_weather, icon)
+    process_icons(parent, current_weather, forecast_weather['daily'])
     parent.after(0, parent.input.get_btn.configure, {'state':tk.NORMAL})
 
 
@@ -25,6 +25,7 @@ def get_current_weather(parent, inp):
         'units': parent.UNIT
     }
     return httpreq(parent, parent.WEATHER_CURRENT_URL, params)
+
 
 def get_city_coords(current_weather):
     return {
@@ -44,18 +45,47 @@ def get_forecast_weather(parent, coords):
     return httpreq(parent, parent.WEATHER_FORECAST_URL, params)
 
 
-def get_icon(parent, host):
-    # parent is the main window, host is the frame that holds the icon
-    
-    # if the icon exists in the cache, then return it. otherwise, download it
-    if host.icon_code in parent.icon_cache:
-        return parent.icon_cache[host.icon_code]
+def process_icons(parent, current_weather, daily_weather):
+    host_list = [parent.current_weather] + parent.forecast_daily.forecast_day_list
+    icon_list = get_icon_codes(current_weather, daily_weather)
+    draw_all_icons(parent, icon_list, host_list)
 
+
+def get_icon_codes(current_weather, daily_weather):
+    icon_list = list()
+    current_icon = current_weather['weather'][0]['icon'] + '@2x'
+    icon_list.append(current_icon)
+    for i in range(1,8):
+        icon_code = daily_weather[i]['weather'][0]['icon']
+        if icon_code not in icon_list:
+            icon_list.append(icon_code)
+    return icon_list
+
+
+def download_icon(parent, icon_code):
+    # parent is the main window
+    # if the icon does not exist in the cache, then it is downloaded
+
+    # this function returns the icon code itself, because we will run this function in a threadpool
+    # and we want to know for which icon the function has completed
+
+    if icon_code in parent.icon_cache:
+        return icon_code
     else:
-        url = f"http://openweathermap.org/img/wn/{host.icon_code}.png"
+        url = f"http://openweathermap.org/img/wn/{icon_code}.png"
         photoimg = ImageTk.PhotoImage(Image.open(io.BytesIO(httpreq(parent, url))))
-        parent.icon_cache[host.icon_code] = photoimg
-        return photoimg
+        parent.icon_cache[icon_code] = photoimg
+        return icon_code
+
+
+def draw_all_icons(parent, icon_list, host_list):
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        future_list = [executor.submit(download_icon, parent, icon_code) for icon_code in icon_list]
+        
+        for res in concurrent.futures.as_completed(future_list):
+            for frame in host_list:
+                if frame.icon_code == res.result():
+                    frame.icon_label.configure(image = parent.icon_cache[frame.icon_code])
 
 
 def httpreq(parent, url, params=None):
@@ -74,10 +104,6 @@ def httpreq(parent, url, params=None):
         print(err)
         parent.after(0, parent.input.get_btn.configure, {'state':tk.NORMAL})
         raise
-
-
-def draw_icon(host, icon):
-    host.icon_label.configure(image=icon)
 
 
 def write_current_output(parent,response):
@@ -103,7 +129,7 @@ def write_forecast_daily_output(parent, daily_weather, timezone_offset):
     for frame in parent.forecast_daily.forecast_day_list:
         frame.day_label.configure(text = DT.datetime.utcfromtimestamp(daily_weather[i]['dt'] + timezone_offset).strftime('%a'))
         frame.icon_code = daily_weather[i]['weather'][0]['icon']
-        frame.weather_desc_label.configure(text = daily_weather[i]['weather'][0]['description'])
+        frame.weather_desc_label.configure(text = daily_weather[i]['weather'][0]['description'].capitalize())
         frame.temp_max_label.configure(text = f"{daily_weather[i]['temp']['max']}°C")
         frame.temp_min_label.configure(text = f"{daily_weather[i]['temp']['min']}°C")
         i += 1
