@@ -29,9 +29,9 @@ More dependencies may be required as the proeject goes on.
 - Then simply run `python weather-tk.py`.
 
 ## Roadmap
-- Add multithreading so that the UI doesn't freeze when getting data from the API (wokr in progress)
-- ~~Add weather icons~~ (done, but the implementation might be changed)
-- Add daily forecast for 7 days
+- ~~Add multithreading so that the UI doesn't freeze when getting data from the API~~ (done)
+- ~~Add weather icons~~ (done)
+- ~~Add daily forecast for 7 days~~ (done)
 - Add hourly forecast for 24 hours
 - Add searched location history
 
