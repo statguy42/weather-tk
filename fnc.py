@@ -15,15 +15,18 @@ def btn_pressed(parent, inp):
     parent.after(0, parent.input.get_btn.configure, {'state':tk.DISABLED})
 
     current_weather = get_current_weather(parent, inp)
-    parent.after(0, write_current_output, parent, current_weather)
+    parent.after(0, write_current_output, parent.current_weather_frame, current_weather)
+
+    parent.after(0, parent.space_label.pack)
 
     coords = get_city_coords(current_weather)
     forecast_weather = get_forecast_weather(parent, coords)
-    parent.after(0, write_forecast_daily_output, parent, forecast_weather['daily'], forecast_weather['timezone_offset'])
+    parent.after(0, write_forecast_daily_output, parent.forecast_daily_frame, forecast_weather['daily'], forecast_weather['timezone_offset'])
 
     process_icons(parent, current_weather, forecast_weather['daily'])
 
     parent.after(0, parent.input.get_btn.configure, {'state':tk.NORMAL})
+    parent.status_label.configure(text=f"Updated at {DT.datetime.now().strftime('%I:%M:%S %p')}")
 
 
 def get_current_weather(parent, inp):
@@ -54,7 +57,7 @@ def get_forecast_weather(parent, coords):
 
 
 def process_icons(parent, current_weather, daily_weather):
-    host_list = [parent.current_weather] + parent.forecast_daily.forecast_day_list
+    host_list = [parent.current_weather_frame] + parent.forecast_daily_frame.forecast_day_list
     icon_list = get_icon_codes(current_weather, daily_weather)
     draw_all_icons(parent, icon_list, host_list)
 
@@ -113,27 +116,26 @@ def httpreq(parent, url, params=None):
         raise
 
 
-def write_current_output(parent,response):
-    parent.current_weather.pack()
-    parent.space_label.pack()
-    parent.status_label.configure(text=f"Updated at {DT.datetime.now().strftime('%I:%M:%S %p')}")
-    parent.current_weather.city_lab.configure(text=f"City: {response['name']}, {response['sys']['country']}")
-    parent.current_weather.temp_lab.configure(text=f"Temp: {response['main']['temp']}°C")
-    parent.current_weather.feels_lab.configure(text=f"Feels like: {response['main']['feels_like']}°C")
-    parent.current_weather.wind_speed_lab.configure(text=f"Wind speed: {response['wind']['speed']} m/s")
-    parent.current_weather.desc_lab.configure(text=response['weather'][0]['description'].capitalize())
-    parent.current_weather.humid_lab.configure(text=f"Humidty: {response['main']['humidity']}%")
-    parent.current_weather.clouds_lab.configure(text=f"Cloudiness: {response['clouds']['all']}%")
-    parent.current_weather.sunrise_lab.configure(text=f"Sunrise: {DT.datetime.utcfromtimestamp(response['sys']['sunrise']+response['timezone']).strftime('%I:%M %p')}")
-    parent.current_weather.sunset_lab.configure(text=f"Sunset: {DT.datetime.utcfromtimestamp(response['sys']['sunset']+response['timezone']).strftime('%I:%M %p')}")
-    parent.current_weather.icon_code = response['weather'][0]['icon'] + "@2x"
+def write_current_output(current_weather_frame, weather):
+    current_weather_frame.pack()
+
+    current_weather_frame.city_lab.configure(text=f"City: {weather['name']}, {weather['sys']['country']}")
+    current_weather_frame.temp_lab.configure(text=f"Temp: {weather['main']['temp']}°C")
+    current_weather_frame.feels_lab.configure(text=f"Feels like: {weather['main']['feels_like']}°C")
+    current_weather_frame.wind_speed_lab.configure(text=f"Wind speed: {weather['wind']['speed']} m/s")
+    current_weather_frame.desc_lab.configure(text=weather['weather'][0]['description'].capitalize())
+    current_weather_frame.humid_lab.configure(text=f"Humidty: {weather['main']['humidity']}%")
+    current_weather_frame.clouds_lab.configure(text=f"Cloudiness: {weather['clouds']['all']}%")
+    current_weather_frame.sunrise_lab.configure(text=f"Sunrise: {DT.datetime.utcfromtimestamp(weather['sys']['sunrise']+weather['timezone']).strftime('%I:%M %p')}")
+    current_weather_frame.sunset_lab.configure(text=f"Sunset: {DT.datetime.utcfromtimestamp(weather['sys']['sunset']+weather['timezone']).strftime('%I:%M %p')}")
+    current_weather_frame.icon_code = weather['weather'][0]['icon'] + "@2x"
     # the "@2x" is appended to the icon code because bigger icons from openweathermap has it in the filename
 
 
-def write_forecast_daily_output(parent, daily_weather, timezone_offset):
-    parent.forecast_daily.pack()
+def write_forecast_daily_output(forecast_daily_frame, daily_weather, timezone_offset):
+    forecast_daily_frame.pack()
     i = 1
-    for frame in parent.forecast_daily.forecast_day_list:
+    for frame in forecast_daily_frame.forecast_day_list:
         frame.day_label.configure(text = DT.datetime.utcfromtimestamp(daily_weather[i]['dt'] + timezone_offset).strftime('%a'))
         frame.icon_code = daily_weather[i]['weather'][0]['icon']
         frame.weather_desc_label.configure(text = daily_weather[i]['weather'][0]['description'].capitalize())
