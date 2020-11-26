@@ -58,9 +58,8 @@ def process_icons(parent, current_weather, daily_weather):
 
 
 def get_icon_codes(current_weather, daily_weather):
-    icon_list = list()
-    current_icon = current_weather['weather'][0]['icon'] + '@2x'
-    icon_list.append(current_icon)
+    icon_list = [current_weather['weather'][0]['icon'] + '@2x']
+
     for i in range(1,8):
         icon_code = daily_weather[i]['weather'][0]['icon']
         if icon_code not in icon_list:
