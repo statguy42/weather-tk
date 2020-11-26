@@ -58,6 +58,7 @@ class InputFrame(tk.Frame):
 
         self.inp = tk.Entry(self, textvariable=self.inp_text)
         self.inp.grid(row=0,column=1)
+        self.inp.bind('<Return>', lambda x: parent.threadworker.submit(btn_pressed, parent, self.inp.get()))
 
         #self.get_btn = tk.Button(self, text="Submit", command=lambda: btn_pressed(parent, self.inp.get()))
         self.get_btn = tk.Button(self, text="Submit", command=lambda: parent.threadworker.submit(btn_pressed, parent, self.inp.get()))
