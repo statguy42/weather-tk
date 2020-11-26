@@ -15,12 +15,14 @@ def btn_pressed(parent, inp):
     parent.after(0, parent.input.get_btn.configure, {'state':tk.DISABLED})
 
     current_weather = get_current_weather(parent, inp)
+    parent.after(0, write_current_output, parent, current_weather)
+
     coords = get_city_coords(current_weather)
     forecast_weather = get_forecast_weather(parent, coords)
-
-    parent.after(0, write_current_output, parent, current_weather)
     parent.after(0, write_forecast_daily_output, parent, forecast_weather['daily'], forecast_weather['timezone_offset'])
+
     process_icons(parent, current_weather, forecast_weather['daily'])
+
     parent.after(0, parent.input.get_btn.configure, {'state':tk.NORMAL})
 
 
