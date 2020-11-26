@@ -8,12 +8,18 @@ import concurrent.futures
 
 
 def btn_pressed(parent, inp):
+    # disable the submit button till the function completes or errors in other function
+    # error probably will only occur in the httpreq() function
+    # so there is a line of code to enable the button again in case of error
+    # tk.after(0, some_func, args) schedules some_func(args) to be run in tkinter's main thread after 0 ms
     parent.after(0, parent.input.get_btn.configure, {'state':tk.DISABLED})
+
     current_weather = get_current_weather(parent, inp)
     coords = get_city_coords(current_weather)
     forecast_weather = get_forecast_weather(parent, coords)
-    parent.after(0, write_current_output(parent, current_weather))
-    parent.after(0, write_forecast_daily_output(parent, forecast_weather['daily'], forecast_weather['timezone_offset']))
+
+    parent.after(0, write_current_output, parent, current_weather)
+    parent.after(0, write_forecast_daily_output, parent, forecast_weather['daily'], forecast_weather['timezone_offset'])
     process_icons(parent, current_weather, forecast_weather['daily'])
     parent.after(0, parent.input.get_btn.configure, {'state':tk.NORMAL})
 
@@ -85,7 +91,7 @@ def draw_all_icons(parent, icon_list, host_list):
         for res in concurrent.futures.as_completed(future_list):
             for frame in host_list:
                 if frame.icon_code == res.result():
-                    frame.icon_label.configure(image = parent.icon_cache[frame.icon_code])
+                    frame.after(0, frame.icon_label.configure, {'image' : parent.icon_cache[frame.icon_code]})
 
 
 def httpreq(parent, url, params=None):
