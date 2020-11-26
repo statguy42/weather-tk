@@ -7,35 +7,35 @@ from PIL import Image, ImageTk
 import concurrent.futures
 
 
-def btn_pressed(parent, inp):
+def btn_pressed(mainwindow, inp):
     # disable the submit button till the function completes or errors in other function
     # error probably will only occur in the httpreq() function
     # so there is a line of code to enable the button again in case of error
     # tk.after(0, some_func, args) schedules some_func(args) to be run in tkinter's main thread after 0 ms
-    parent.after(0, parent.input.get_btn.configure, {'state':tk.DISABLED})
+    mainwindow.after(0, mainwindow.input.get_btn.configure, {'state':tk.DISABLED})
 
-    current_weather = get_current_weather(parent, inp)
-    parent.after(0, write_current_output, parent.current_weather_frame, current_weather)
+    current_weather = get_current_weather(mainwindow, inp)
+    mainwindow.after(0, write_current_output, mainwindow.current_weather_frame, current_weather)
 
-    parent.after(0, parent.space_label.pack)
+    mainwindow.after(0, mainwindow.space_label.pack)
 
     coords = get_city_coords(current_weather)
-    forecast_weather = get_forecast_weather(parent, coords)
-    parent.after(0, write_forecast_daily_output, parent.forecast_daily_frame, forecast_weather['daily'], forecast_weather['timezone_offset'])
+    forecast_weather = get_forecast_weather(mainwindow, coords)
+    mainwindow.after(0, write_forecast_daily_output, mainwindow.forecast_daily_frame, forecast_weather['daily'], forecast_weather['timezone_offset'])
 
-    process_icons(parent, current_weather, forecast_weather['daily'])
+    process_icons(mainwindow, current_weather, forecast_weather['daily'])
 
-    parent.after(0, parent.input.get_btn.configure, {'state':tk.NORMAL})
-    parent.status_label.configure(text=f"Updated at {DT.datetime.now().strftime('%I:%M:%S %p')}")
+    mainwindow.after(0, mainwindow.input.get_btn.configure, {'state':tk.NORMAL})
+    mainwindow.status_label.configure(text=f"Updated at {DT.datetime.now().strftime('%I:%M:%S %p')}")
 
 
-def get_current_weather(parent, inp):
+def get_current_weather(mainwindow, inp):
     params = {
         'q':inp,
-        'appid': parent.API_KEY,
-        'units': parent.UNIT
+        'appid': mainwindow.API_KEY,
+        'units': mainwindow.UNIT
     }
-    return httpreq(parent, parent.WEATHER_CURRENT_URL, params)
+    return httpreq(mainwindow, mainwindow.WEATHER_CURRENT_URL, params)
 
 
 def get_city_coords(current_weather):
@@ -45,21 +45,21 @@ def get_city_coords(current_weather):
     }
 
 
-def get_forecast_weather(parent, coords):
+def get_forecast_weather(mainwindow, coords):
     params = {
         'lon' : coords['lon'],
         'lat' : coords['lat'],
-        'appid' : parent.API_KEY,
+        'appid' : mainwindow.API_KEY,
         'exclude' : 'current,minutely,hourly',
-        'units': parent.UNIT
+        'units': mainwindow.UNIT
     }
-    return httpreq(parent, parent.WEATHER_FORECAST_URL, params)
+    return httpreq(mainwindow, mainwindow.WEATHER_FORECAST_URL, params)
 
 
-def process_icons(parent, current_weather, daily_weather):
-    host_list = [parent.current_weather_frame] + parent.forecast_daily_frame.forecast_day_list
+def process_icons(mainwindow, current_weather, daily_weather):
+    host_list = [mainwindow.current_weather_frame] + mainwindow.forecast_daily_frame.forecast_day_list
     icon_list = get_icon_codes(current_weather, daily_weather)
-    draw_all_icons(parent, icon_list, host_list)
+    draw_all_icons(mainwindow, icon_list, host_list)
 
 
 def get_icon_codes(current_weather, daily_weather):
@@ -72,33 +72,33 @@ def get_icon_codes(current_weather, daily_weather):
     return icon_list
 
 
-def download_icon(parent, icon_code):
-    # parent is the main window
+def download_icon(mainwindow, icon_code):
+    # mainwindow is the main window
     # if the icon does not exist in the cache, then it is downloaded
 
     # this function returns the icon code itself, because we will run this function in a threadpool
     # and we want to know for which icon the function has completed
 
-    if icon_code in parent.icon_cache:
+    if icon_code in mainwindow.icon_cache:
         return icon_code
     else:
         url = f"http://openweathermap.org/img/wn/{icon_code}.png"
-        photoimg = ImageTk.PhotoImage(Image.open(io.BytesIO(httpreq(parent, url))))
-        parent.icon_cache[icon_code] = photoimg
+        photoimg = ImageTk.PhotoImage(Image.open(io.BytesIO(httpreq(mainwindow, url))))
+        mainwindow.icon_cache[icon_code] = photoimg
         return icon_code
 
 
-def draw_all_icons(parent, icon_list, host_list):
+def draw_all_icons(mainwindow, icon_list, host_list):
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        future_list = [executor.submit(download_icon, parent, icon_code) for icon_code in icon_list]
+        future_list = [executor.submit(download_icon, mainwindow, icon_code) for icon_code in icon_list]
         
         for res in concurrent.futures.as_completed(future_list):
             for frame in host_list:
                 if frame.icon_code == res.result():
-                    frame.after(0, frame.icon_label.configure, {'image' : parent.icon_cache[frame.icon_code]})
+                    frame.after(0, frame.icon_label.configure, {'image' : mainwindow.icon_cache[frame.icon_code]})
 
 
-def httpreq(parent, url, params=None):
+def httpreq(mainwindow, url, params=None):
     if params is not None:
         url = url + urllib.parse.urlencode(params)
 
@@ -110,9 +110,9 @@ def httpreq(parent, url, params=None):
                 return req.read()
 
     except urllib.error.HTTPError as err:
-        parent.status_label.configure(text=err)
+        mainwindow.status_label.configure(text=err)
         print(err)
-        parent.after(0, parent.input.get_btn.configure, {'state':tk.NORMAL})
+        mainwindow.after(0, mainwindow.input.get_btn.configure, {'state':tk.NORMAL})
         raise
 
 
