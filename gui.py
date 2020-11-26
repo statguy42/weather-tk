@@ -42,7 +42,7 @@ class MainWindow(tk.Tk):
         except:
             self.status_label.configure(text = "error openning api_key.txt")
             api_key = askstring(title = "api_key.txt not found", prompt = "Please enter api key: ", parent = self)
-            if api_key is None:
+            if api_key is None or api_key == "":
                 self.input.get_btn.configure(state=tk.DISABLED)
                 self.status_label.configure(text = "No API key provided")
             else:
