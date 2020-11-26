@@ -33,18 +33,21 @@ class MainWindow(tk.Tk):
         self.WEATHER_CURRENT_URL = "http://api.openweathermap.org/data/2.5/weather?"
         self.WEATHER_FORECAST_URL = "https://api.openweathermap.org/data/2.5/onecall?"
         self.UNIT = "metric"
+        self.API_KEY = self.init_api_key()
 
+    def init_api_key(self):
         try:
             with open("api_key.txt") as keyfile:
-                self.API_KEY = keyfile.read().rstrip("\n")
+                api_key = keyfile.read().rstrip("\n")
         except:
             self.status_label.configure(text = "error openning api_key.txt")
-            self.API_KEY = askstring(title = "api_key.txt not found", prompt = "Please enter api key: ", parent = self)
-            if self.API_KEY is None:
+            api_key = askstring(title = "api_key.txt not found", prompt = "Please enter api key: ", parent = self)
+            if api_key is None:
                 self.input.get_btn.configure(state=tk.DISABLED)
                 self.status_label.configure(text = "No API key provided")
             else:
                 self.status_label.configure(text = "")
+        return api_key
 
 
 class InputFrame(tk.Frame):
