@@ -111,6 +111,7 @@ def httpreq(mainwindow, url, params=None):
 
     except urllib.error.HTTPError as err:
         mainwindow.status_label.configure(text=err)
+        print(url)
         print(err)
         mainwindow.after(0, mainwindow.input.get_btn.configure, {'state':tk.NORMAL})
         raise
