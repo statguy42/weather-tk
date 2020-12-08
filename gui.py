@@ -1,28 +1,32 @@
 import tkinter as tk
+from tkinter import ttk
 from tkinter.simpledialog import askstring
+from ttkthemes import ThemedTk
 from fnc import btn_pressed
 
 
-class MainWindow(tk.Tk):
+class MainWindow(ThemedTk):
     def __init__(self, threadworker):
-        super().__init__()
+        super().__init__(theme = "elegance")
         self.title('Weather')
-        #self.geometry('410x330')
 
-        self.lab1 = tk.Label(self)
+        self.mainframe = ttk.Frame(self)
+        self.mainframe.pack(fill = "both")
+
+        self.lab1 = ttk.Label(self.mainframe)
         self.lab1.configure(text="Enter city:")
         self.lab1.pack()
 
-        self.input = InputFrame(self)
+        self.input = InputFrame(self.mainframe, self)
         self.input.pack()
 
-        self.status_label = tk.Label(self)
+        self.status_label = ttk.Label(self.mainframe)
         self.status_label.pack()
 
-        self.current_weather_frame = CurrentWeatherFrame(self)
-        self.space_label = tk.Label(self, text = " ")
+        self.current_weather_frame = CurrentWeatherFrame(self.mainframe)
+        self.space_label = ttk.Label(self, text = " ")
         # this lable is used to create e bit of space between the two frames
-        self.forecast_daily_frame = ForecastDailyFrame(self)
+        self.forecast_daily_frame = ForecastDailyFrame(self.mainframe)
         # these two frames and the label get packed after the button is pressed
 
         # the following dict is used to cache icons in memory
@@ -50,69 +54,69 @@ class MainWindow(tk.Tk):
         return api_key
 
 
-class InputFrame(tk.Frame):
-    def __init__(self,parent):
+class InputFrame(ttk.Frame):
+    def __init__(self, parent, mainwindow):
         super().__init__(parent)
         self.inp_text = tk.StringVar()
         self.inp_text.set("London")
 
-        self.inp = tk.Entry(self, textvariable=self.inp_text)
+        self.inp = ttk.Entry(self, textvariable=self.inp_text)
         self.inp.grid(row=0,column=1)
         self.inp.bind('<Return>', lambda x: parent.threadworker.submit(btn_pressed, parent, self.inp.get()))
 
-        #self.get_btn = tk.Button(self, text="Submit", command=lambda: btn_pressed(parent, self.inp.get()))
-        self.get_btn = tk.Button(self, text="Submit", command=lambda: parent.threadworker.submit(btn_pressed, parent, self.inp.get()))
+        #self.get_btn = ttk.Button(self, text="Submit", command=lambda: btn_pressed(parent, self.inp.get()))
+        self.get_btn = ttk.Button(self, text="Submit", command=lambda: mainwindow.threadworker.submit(btn_pressed, mainwindow, self.inp.get()))
         self.get_btn.grid(row=0,column=2)
 
 
-class CurrentWeatherFrame(tk.Frame):
+class CurrentWeatherFrame(ttk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
 
-        self['bg'] = '#CCCCCC'
+        #self['bg'] = '#CCCCCC'
 
-        self.city_lab = tk.Label(self)
+        self.city_lab = ttk.Label(self)
         self.city_lab.grid(row=0, column=0, sticky='W')
 
-        self.temp_lab = tk.Label(self)
+        self.temp_lab = ttk.Label(self)
         self.temp_lab.grid(row=1,column=0, sticky='W')
 
-        self.feels_lab = tk.Label(self)
+        self.feels_lab = ttk.Label(self)
         self.feels_lab.grid(row=2, column=0, sticky='W')
 
-        self.humid_lab = tk.Label(self)
+        self.humid_lab = ttk.Label(self)
         self.humid_lab.grid(row=3, column=0, sticky='W')
 
         self.icon_code = None
 
-        self.icon_label = tk.Label(self)
+        self.icon_label = ttk.Label(self)
         self.icon_label.grid(row=0, column=1, rowspan=3)
 
-        self.desc_lab = tk.Label(self)
+        self.desc_lab = ttk.Label(self)
         self.desc_lab.grid(row=2,column=1, rowspan=2)
 
-        self.wind_speed_lab = tk.Label(self)
+        self.wind_speed_lab = ttk.Label(self)
         self.wind_speed_lab.grid(row=0, column=2, sticky='E')
 
-        self.clouds_lab = tk.Label(self)
+        self.clouds_lab = ttk.Label(self)
         self.clouds_lab.grid(row=1, column=2, sticky='E')
 
-        self.sunrise_lab = tk.Label(self)
+        self.sunrise_lab = ttk.Label(self)
         self.sunrise_lab.grid(row=2, column=2, sticky='E')
 
-        self.sunset_lab = tk.Label(self)
+        self.sunset_lab = ttk.Label(self)
         self.sunset_lab.grid(row=3, column=2, sticky='E')
 
         # change background color of all child widgets
-        for widget in self.children.values():
-            widget['bg'] = "#CCCCCC"
+        #for widget in self.children.values():
+            #widget['bg'] = "#CCCCCC"
 
 
-class ForecastDailyFrame(tk.Frame):
+class ForecastDailyFrame(ttk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
 
-        self['bg'] = '#CCCCCC'
+        #self['bg'] = '#CCCCCC'
 
         self.forecast_day_list = list()
 
@@ -121,28 +125,28 @@ class ForecastDailyFrame(tk.Frame):
             self.forecast_day_list[i].grid(row=0, column=i)
 
 
-class ForecastDayFrame(tk.Frame):
+class ForecastDayFrame(ttk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
 
-        self['bg'] = '#CCCCCC'
+        #self['bg'] = '#CCCCCC'
 
-        self.day_label = tk.Label(self, text = "test")
+        self.day_label = ttk.Label(self, text = "test")
         self.day_label.grid(row=0, column=0)
 
         self.icon_code = None
 
-        self.icon_label = tk.Label(self)
+        self.icon_label = ttk.Label(self)
         self.icon_label.grid(row=1, column=0)
 
-        self.weather_desc_label = tk.Label(self)
+        self.weather_desc_label = ttk.Label(self)
         self.weather_desc_label.grid(row=2, column=0)
 
-        self.temp_max_label = tk.Label(self)
+        self.temp_max_label = ttk.Label(self)
         self.temp_max_label.grid(row=3, column=0)
 
-        self.temp_min_label = tk.Label(self)
+        self.temp_min_label = ttk.Label(self)
         self.temp_min_label.grid(row=4, column=0)
 
-        for widget in self.children.values():
-            widget['bg'] = "#CCCCCC"
+        #for widget in self.children.values():
+            #widget['bg'] = "#CCCCCC"
