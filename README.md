@@ -34,6 +34,8 @@ More dependencies may be required as the proeject goes on.
 - ~~Add daily forecast for 7 days~~ (done)
 - Add hourly forecast for 24 hours
 - Add searched location history
+- Probably change how icons are cached
+- Maybe add theme support
 
 ## Contribution
 This project is open to suggestions and pull requests.
