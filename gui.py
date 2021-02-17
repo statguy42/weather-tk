@@ -6,7 +6,7 @@ from fnc import btn_pressed
 class MainWindow(tk.Tk):
     def __init__(self, threadworker):
         super().__init__()
-        self.title('Weather')
+        self.title('WeatherTk')
         #self.geometry('410x330')
 
         self.lab1 = tk.Label(self)
@@ -21,31 +21,43 @@ class MainWindow(tk.Tk):
 
         self.current_weather_frame = CurrentWeatherFrame(self)
         self.space_label = tk.Label(self, text = " ")
-        # this lable is used to create e bit of space between the two frames
+        # this label is used to create e bit of space between the two frames
         self.forecast_daily_frame = ForecastDailyFrame(self)
-        # these two frames and the label get packed after the button is pressed
+        # these two frames and the label get packed after weather is fetched
 
         # the following dict is used to cache icons in memory
+        # this is only a "temporary" solution and will be changed "soon"
         self.icon_cache = dict()
 
         self.threadworker = threadworker
 
         self.WEATHER_CURRENT_URL = "http://api.openweathermap.org/data/2.5/weather?"
         self.WEATHER_FORECAST_URL = "https://api.openweathermap.org/data/2.5/onecall?"
-        self.UNIT = "metric"
+        self.UNIT = "metric"    # TODO: add option in the gui to change the unit
         self.API_KEY = self.init_api_key()
 
     def init_api_key(self):
+        # reads openweathermap api key
+        # from a file named api_key.txt in the same directory where the main script of the app is run from
+        # it must be a plain text file, only containing the api key
+        # TODO: just realized that I should not be openning a file from tkinter's main thread, will fix it "soon"
+
+        # if the file is not found then the user is prompted to enter an api key
+        # TODO: save the user entered api key to api_key.txt after a successful paste
+        # TODO: probably add test to determine if it's a "correct" api key
+
         try:
             with open("api_key.txt") as keyfile:
-                api_key = keyfile.read().rstrip("\n")
+                api_key = keyfile.read().rstrip("\n")    # striping it in case there's an empty line at the end of the file
         except:
-            self.status_label.configure(text = "error openning api_key.txt")
+            self.status_label.configure(text = "error openning api_key.txt")    # asking the user to enter the key in the next line
             api_key = askstring(title = "api_key.txt not found", prompt = "Please enter api key: ", parent = self)
             if api_key is None or api_key == "":
+                # if api_key.txt not found and user enters no key:
                 self.input.get_btn.configure(state=tk.DISABLED)
                 self.status_label.configure(text = "No API key provided")
             else:
+                # if the user enters the key:
                 self.status_label.configure(text = "")
         return api_key
 
@@ -69,7 +81,7 @@ class CurrentWeatherFrame(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
 
-        self['bg'] = '#CCCCCC'
+        self['bg'] = '#CCCCCC'    # to have a bit of contrast with the openweathermap icons
 
         self.city_lab = tk.Label(self)
         self.city_lab.grid(row=0, column=0, sticky='W')
