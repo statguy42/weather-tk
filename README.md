@@ -38,4 +38,4 @@ More dependencies may be required as the proeject goes on.
 - Maybe add theme support
 
 ## Contribution
-This project is open to suggestions and pull requests.
+This project is open to suggestions and pull requests. Hit me up if you have any ideas regarding this project or even anything else.
